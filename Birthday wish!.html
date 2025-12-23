@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Dear Darryl,🎉</title>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: #000000;
+      overflow: hidden;
+    }
+
+    /* ===== MAIN STATIC IMAGE ===== */
+    #mainImage {
+      position: absolute;
+      top: 390px;
+      /* move up/down */
+      left: 30%;
+      transform: translate(-50%, -50%);
+      width: 700px;
+      /* resize */
+      object-fit: cover;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    /* ===== LOOPING IMAGE ===== */
+    #loopImage {
+      position: absolute;
+      top: 50%;
+      left: 80%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      object-fit: cover;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    #loopImage:hover {
+      transform: translate(-50%, -50%) scale(1.08);
+    }
+
+    #mainImage:hover {
+      transform: translate(-50%, -50%) scale(1.08);
+    }
+
+    canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- MAIN IMAGE -->
+  <img id="mainImage" src="images/main.jpg">
+
+  <!-- LOOPING IMAGE -->
+  <img id="loopImage" src="images/loop1.jpg">
+
+  <!-- AUDIO -->
+  <audio id="song" src="birthday.mp3"></audio>
+
+  <!-- CONFETTI -->
+  <canvas id="confetti"></canvas>
+
+  <script>
+    /* ===== LOOPING IMAGES ===== */
+    const loopImages = [
+      "images/loop1.jpg",
+      "images/loop2.jpg",
+      "images/loop3.jpg"
+    ];
+
+    let index = 0;
+    let clicked = false;
+
+    const loopImg = document.getElementById("loopImage");
+    const song = document.getElementById("song");
+
+    /* Image loop */
+    const loopInterval = setInterval(() => {
+      if (!clicked) {
+        index = (index + 1) % loopImages.length;
+        loopImg.src = loopImages[index];
+      }
+    }, 900);
+
+    /* ===== CONFETTI ===== */
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let confetti = [];
+
+    function startConfetti() {
+      confetti = [];
+      for (let i = 0; i < 250; i++) {
+        confetti.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 6 + 2,
+          speed: Math.random() * 4 + 2
+        });
+      }
+      animateConfetti();
+    }
+
+    function animateConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `hsl(${Math.random() * 360},100%,50%)`;
+        ctx.fill();
+        p.y += p.speed;
+        if (p.y > canvas.height) p.y = 0;
+      });
+      requestAnimationFrame(animateConfetti);
+    }
+
+    /* ===== CLICK EVENT ===== */
+    loopImg.addEventListener("click", () => {
+      if (!clicked) {
+        clicked = true;
+        loopImg.src = "images/clicked.jpg";
+
+        song.currentTime = 0;
+        song.play().catch(e => console.log(e));
+
+        startConfetti();
+      }
+    });
+  </script>
+
+</body>
+
+</html>
